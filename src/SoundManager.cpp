@@ -1,12 +1,4 @@
-#ifndef SDL_MIXER_H
-#define SDL_MIXER_H
-#include "SDL2/SDL_mixer.h"
-#endif
 
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
 
 class SoundManager
 {

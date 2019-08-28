@@ -2,18 +2,7 @@
 Player class
 
 */ 
-#ifndef ENTITY_H
-#define ENTITY_H
-#include "Entity.cpp"
-#endif
-#ifndef SPRITE_H
-#define SPRITE_H
-#include "Sprite.cpp"
-#endif
-#ifndef ACTOR_CPP
-#define ACTOR_CPP
-#include "Actor.cpp"
-#endif
+
 
 // The player that will move around on the screen   
 class Player : public Actor
@@ -42,8 +31,7 @@ class Player : public Actor
 		mPosition = pos;
 		mCollider = colliderDim;
         mSpeedDef = 2;
-        mSprite = new Sprite();
-        mSprite->init(tex,dim);
+        Sprite::init(tex,dim);
         Point  pointData[][4] = {
             {Point(0,0),Point(32,0),Point(64,0),Point(-1,-1)} , {Point(0,32),Point(32,32),Point(64,32),Point(-1,-1)},
             {Point(0,64),Point(32,64),Point(64,64),Point(-1,-1)},
@@ -52,9 +40,9 @@ class Player : public Actor
         char * names[] = {"walk-up", "walk-right","walk-down", "walk-left"};
        
         for(int i=0;i<4;i++){
-             mSprite->addAnimation(names[i],pointData[i]);
+             addAnimation(names[i],pointData[i]);
         }
-        mSprite->setAnimation("walk-down");
+        setAnimation("walk-down");
 	}
 	
 	// player event handler
@@ -84,19 +72,7 @@ class Player : public Actor
 		//const Uint8 *state = SDL_GetKeyboardState(NULL);
         //if (state[SDL_SCANCODE_D
 	}
-	
 
-
-	
-	void render(SDL_Renderer * r)
-	{
-		mSprite->render(r,mPosition.x, mPosition.y);
-	}
-    
-    void render(SDL_Renderer * r, Point viewPortOffset)
-	{
-		mSprite->render(r,mPosition.x - viewPortOffset.x, mPosition.y - viewPortOffset.y);
-	}
 	
 	void die(){
 	}

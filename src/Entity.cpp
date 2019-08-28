@@ -2,15 +2,6 @@
 Entity class
 
 */ 
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
-#ifndef UTIL_CPP
-#define UTIL_CPP
-#include "Util.cpp"
-#endif
-
 
 class Entity
 {
@@ -28,15 +19,12 @@ class Entity
 	
     enum State
     {
-      Undefined, // USed when uninitialised 
-      Moving,
-      Stopped,
+      Undefined=0, // USed when uninitialised 
       Blocked,
-      Frozen,
-      Dead
+      Dead=10 // States 0-10 reserved for entity
     };
 	
-    enum State mState = Entity::Undefined;
+    int mState = Entity::Undefined;
 	
 	Entity()
 	{ 	
@@ -46,13 +34,13 @@ class Entity
 	} 
 	
 	Entity::State setState(State newState){
-        State old = mState;
+        int old = mState;
         mState = newState;
-        return old;
+        return static_cast<State>(old);
     }
     
     Entity::State getState(){
-        return mState;
+        return static_cast<State>(mState);
     }
 
 	bool collidesWith(SDL_Rect * obj)

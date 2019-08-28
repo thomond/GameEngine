@@ -1,17 +1,4 @@
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
-#include "SDL2/SDL_ttf.h"
-#endif
-#ifndef TEXTURE_CPP
-#define TEXTURE_CPP
-#include "Texture.cpp"
-#endif
-#ifndef UTIL_CPP
-#define UTIL_CPP
-#include "Util.cpp"
-#endif
+#pragma once
 #include "string.h"
 // Texture wrapper class
 class TextTexture : public Texture

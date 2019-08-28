@@ -1,15 +1,4 @@
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
-#ifndef SDL_IMAGE_H
-#define SDL_IMAGE_H
-#include "SDL2/SDL_image.h"
-#endif
-#ifndef UTIL_CPP
-#define UTIL_CPP
-#include "Util.cpp"
-#endif
+
 
 class Animation{
 
@@ -23,6 +12,8 @@ public:
       Stopped,
       Paused
     };
+    
+    Animation(int tilesetid , int id, Point dimensions){mTilesetID = tilesetid; mID = id; mFrameDim =  dimensions; }
     
     Animation(char * name, Point dimensions){
         mFrameIndex = 0;
@@ -103,6 +94,8 @@ private:
     int mFrameIndex;
     Point mFrames[4]; // Max four frames
     char * mName;
+    int mID;
+    int mTilesetID;
     int mFrameAmnt;
     Timer mTimer;    
 

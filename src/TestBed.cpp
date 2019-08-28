@@ -1,10 +1,8 @@
 #include "Game.cpp"
-#include "Player.cpp"
-#include "Tilemapper.cpp"
-#include "AIActor.cpp"
 #include <iostream>
 #include <vector>
-
+#include <tmxlite/Map.hpp>
+#include <tmxlite/TileLayer.hpp>
 class TestBed : public Game
 {
 private:
@@ -30,46 +28,28 @@ public:
         // Add actor to game Actor queue
         addActor(player);
         addActor(aiactor);
+        
+        loadFromTMX("tilemap.tmx");
+        
         // Add a toolbar
-        ui->addToolbar({0,0,display->getViewPort()->w,50},"test");
+        //ui->addToolbar({0,0,display->getViewPort()->w,50},"test");
         
         // Create and set a tilemapper to random, set to bg layer of game
-        tilemapper = new Tilemapper();
-        tilemapper->init("tiles.png",Point(32,32),9);
-        Texture * background = tilemapper->randomize(display->getRenderer(), Point(1920,1080));
-        //display->setLayer(0,background);
+        //tilemapper = getTilemapper();
+        //tilemapper->init("tilemap.tmx");
         
-        // Add new rect to the game Collison grid in broder around stage
-        std::vector<SDL_Rect> rects;
-        std::vector<int> tileIDs;
-        for(int y=0;y<1920/32;y++)
-            for(int x =0; x<1080/32;x++)
-                if(x==0||y==0) {
-                    SDL_Rect r = {x*32,y*32,32,32};
-                    tileIDs.push_back(8);
-                    rects.push_back(r);
-                }
-        
-        // Add a square box to test Enemy collision detection
-        for(int y=6;y<=10;y++)
-            for(int x =6; x<=10;x++){
-                if(x==10 || y == 6 || x==6 || y==10){
-                    SDL_Rect r = {x*32,y*32,32,32};
-                    tileIDs.push_back(8);
-                    rects.push_back(r);
-                }
-
-            }
+    
             
+        //addLayer(0,tilemapper->getLayer("BGLayer"));
+       // addLayer(1,tilemapper->getLayer("FGLayer"));
+    
 
-        addCollisionRects(rects);
-        int rgb[3] = {0,255,0};
-        Texture * walls = Texture::generate(display->getRenderer(), {32, 32},{0,255,0},{0,255,0});
-        //tilemapper->generate(display->getRenderer(), Point(1920,1080), rects , tileIDs);
-        display->setLayer(1,walls);
+
         
         display->setRenderScale(1.5);
     }
+    
+
     
     void update(){
         aiactor->pivotTo(player->getPos());

@@ -1,7 +1,4 @@
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
+#pragma once
 #include <time.h>
 #include <stdlib.h>
 #include <string>
@@ -16,7 +13,7 @@ public:
     int y;
     Point(){x=0;y=0;}
     Point(int _x,int _y){x=_x;y=_y;}
-    set(int _x, int _y){x=_x;y=_y;}
+    void set(int _x, int _y){x=_x;y=_y;}
     
     Point operator+(Point arg) 
     {
@@ -202,5 +199,6 @@ public:
     
     
 };
+
 
 

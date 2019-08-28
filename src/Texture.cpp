@@ -1,19 +1,4 @@
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
-#ifndef SDL_IMAGE_H
-#define SDL_IMAGE_H
-#include "SDL2/SDL_image.h"
-#endif
-#ifndef SDL_TTF_H
-#define SDL_TTF_H
-#include "SDL2/SDL_ttf.h"
-#endif
-#ifndef UTIL_CPP
-#define UTIL_CPP
-#include "Util.cpp"
-#endif
+
 // Texture wrapper class
 class Texture
 {
@@ -62,29 +47,24 @@ class Texture
         return loadedSurface;
     }
 	
+	static SDL_Texture * loadTextureFromFile(SDL_Renderer * renderer, char *  path){
+		return SDL_CreateTextureFromSurface(renderer,loadSurfacefromFile(path));
+    }
+	
 	static Texture * loadFromFile(SDL_Renderer * renderer, char *  path){
-		// Remove any previous image
-		//free();
-		//The final texture to be returned
-		SDL_Texture * newTexture = NULL;
-		
-		// Load img
-		SDL_Surface * loadedSurface = IMG_Load(path);
-		if (!loadedSurface){
-			SDL_Log("Unable to load image: %s\n",IMG_GetError());
-			return NULL;
-		}
-		// Set colour key
-		SDL_SetColorKey(loadedSurface,SDL_TRUE,SDL_MapRGB(loadedSurface->format,0xff,0x00,0xff));
-		newTexture = SDL_CreateTextureFromSurface(renderer,loadedSurface);
+
+		SDL_Texture * newTexture = loadTextureFromFile(renderer, path);
 		if(!newTexture){
 			SDL_Log("Unable to load texture: %s\n",SDL_GetError());
 			return NULL;
 		}
-		int width = loadedSurface->w;
-		int height = loadedSurface->h;
-		SDL_FreeSurface(loadedSurface);
-		return new Texture(newTexture, width, height);
+		int w,h;
+		SDL_QueryTexture(newTexture,
+                     NULL,
+                     NULL,
+                     &w,
+                     &h);
+		return new Texture(newTexture, w, h);
 	}
 
 	

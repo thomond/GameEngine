@@ -1,7 +1,4 @@
-#ifndef TEXTURE_CPP
-#define TEXTURE_CPP
-#include "Texture.cpp"
-#endif
+
 
 class AssetManager{    
     SDL_Renderer * mRenderer;

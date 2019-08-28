@@ -1,7 +1,4 @@
 #include "Game.cpp"
-#include "Player.cpp"
-#include "Tilemapper.cpp"
-#include "AIActor.cpp"
 #include <iostream>
 #include <vector>
 

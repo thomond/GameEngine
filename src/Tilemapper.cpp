@@ -1,123 +1,103 @@
-#ifndef SDL_H
-#define SDL_H
-#include "SDL2/SDL.h"
-#endif
-#ifndef TEXTURE_CPP
-#define TEXTURE_CPP
-#include "Texture.cpp"
-#endif
-#ifndef UTIL_CPP
-#define UTIL_CPP
-#include "Util.cpp"
-#endif
+#include "Tilemapper.h"
 
-class Tilemapper{
-public:
-    Tilemapper(){}
+
+Tilemapper::Tilemapper(SDL_Renderer * r) {
+    mRenderer = r;
+}
+
+Point Tilemapper::getTileCoords(int index) {
+    // transform tilemap lindex to x,y absolure co-ords on tilesheet
+    if(index!=0) index = index-1;
+    int index_y = 0;
+    if(index/mTiles.cols > 0)
+        index_y=1;
+    int index_x = abs((mTiles.cols *  index_y)-index);
+    return Point(mTiles.dim.x * index_x, mTiles.dim.y * index_y);
+
+}
+
+Point Tilemapper::getTileCoords(Tileset& tileset,int index) {
+    // transform tilemap lindex to x,y absolure co-ords on tilesheet
+    if(index!=0) index = index-1;
+    int index_y = 0;
+    if(index/tileset.cols > 0)
+        index_y=1;
+    int index_x = abs((tileset.cols *  index_y)-index);
+    return Point(tileset.dim.x * index_x, tileset.dim.y * index_y);
+
+}
+
+
+
+
+
+Texture * Tilemapper::randomize(SDL_Renderer * r, Point texDim) {
+
+//     SDL_Surface * destSurface = SDL_CreateRGBSurface(0, texDim.x, texDim.y, 32, 0, 0, 0, 0);
+//     for(int y=0; y<texDim.y; y += mTiles.dim.y)
+//         for(int x=0; x<texDim.x;x += mTiles.dim.x)
+//         {
+//             Point srcTileIndex = getTileCoords(Random::randInt(0,mTiles.num));
+//             SDL_Rect src = {srcTileIndex.x, srcTileIndex.y, mTiles.dim.x, mTiles.dim.y};
+//             SDL_Rect dest = {x,y, mTiles.dim.x, mTiles.dim.y};
+//             SDL_BlitSurface(mTiles.tilemap, &src , destSurface, &dest);
+//         }
+//
+//     SDL_Texture * newTexture = SDL_CreateTextureFromSurface(r,destSurface);
+//     if(!newTexture){
+//         SDL_Log("Unable to load texture: %s\n",SDL_GetError());
+}
+
+Texture* Tilemapper::generateTexture(SDL_Renderer * renderer, std::vector<Tileset>& tilesets, Layer& layer)
+{
     
-    void init(char * filename, Point tileDim, int tilesAmnt){
-        mTilemap = Texture::loadSurfacefromFile(filename);
-        mTileDim = tileDim;
-        mTilesAmnt = tilesAmnt;
-    }
-    
-    Point getTileCoords(int index){
-        return Point(mTileDim.x * index, 0);
-    }
+    // generate layer texture
+    SDL_Point gridSz = {layer.dim.x * tilesets[0].dim.x, layer.dim.y * tilesets[0].dim.y};
+    SDL_Texture * newTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,gridSz.x,gridSz.y);
+    SDL_SetTextureBlendMode(newTexture, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderTarget(renderer,newTexture);
 
-    /*
-     * generate a texture of texDim dimensions using given tile tileIDs
-     * Tile IDs can be translated to absolute tilemap co-ords using internal function
-    */
-    Texture * generate(SDL_Renderer * r , Point texDim, std::vector<int> tileIDs){
-        SDL_Surface * destSurface = SDL_CreateRGBSurface(0, texDim.x, texDim.y, 32, 0, 0, 0, 0);
-        SDL_SetColorKey(destSurface,SDL_TRUE,SDL_MapRGB(destSurface->format,0x00,0x00,0x00));
-        int x=0,y=0;
-        for(int& i : tileIDs){
-            if(i=='\n'){ y++; x=0;} // New row
-            else{ // Treat as column; get abs co-ords of tile on map and transpose to surface
-                Point loc = getTileCoords(i);
-                SDL_Rect src = {loc.x, loc.y, mTileDim.x, mTileDim.y};
-                SDL_Rect dest = {x*mTileDim.x , y*mTileDim.y ,texDim.x, texDim.y};
-                SDL_BlitSurface(mTilemap, &src , destSurface, &dest);
-                x++;
-            }
-           
-            SDL_Texture * newTexture = SDL_CreateTextureFromSurface(r,destSurface);
-            if(!newTexture){
-                SDL_Log("Unable to load texture: %s\n",SDL_GetError());
-                return NULL;
-            }
-            int width = destSurface->w;
-            int height = destSurface->h;
-            SDL_FreeSurface(destSurface);
-            return new Texture(newTexture, width, height);
-                
-                
-            }
-    }
 
-    static Texture* generate(SDL_Renderer * r, Point dim, std::vector<SDL_Rect> rects, SDL_Color color, SDL_Color outlineColor){
-        
-        SDL_Texture * newTexture = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,dim.x,dim.y);
-        SDL_SetRenderTarget(r,newTexture);
-        for(SDL_Rect rect : rects){
-            SDL_SetRenderDrawColor(r, color.r, color.g, color.b, 0x00);
-            Texture * recttex = Texture::generate(r,{rect.w,rect.h},color,outlineColor);
-            SDL_RenderDrawRect(r,&rect);
+    for(int y=0; y < layer.dim.y ; y++) {
+        for(int x=0; x < layer.dim.x ; x++) {
+            // Get the needed tileset based on the Global tile ID of the layer
+            auto tileset = getTilesetByGlobalID(layer.IDs[y][x],tilesets);
             
+            SDL_Rect dstRect = { tileset.dim.x * x, tileset.dim.y * y, tileset.dim.x, tileset.dim.y };
+            Point loc = getTileCoords(tileset, layer.IDs[y][x]);
+            SDL_Rect srcRect = {loc.x, loc.y, tileset.dim.x, tileset.dim.y};
+            // Add collision rects for layer
+            for(int i=0; i<tileset.colliders.size(); i++) {
+                if (layer.IDs[y][x] == tileset.colliders[i].ID) {
+                    layer.colliders.push_back(dstRect);
+                    layer.actionState = tileset.colliders[i].state;
+                }
+            }
+            SDL_RenderCopy(renderer, tileset.tilemap,&srcRect, &dstRect );
         }
-            
-        SDL_SetRenderTarget(r,NULL);
-        return  new Texture(newTexture, dim.x, dim.y);
     }
-    
-    Texture * generate(SDL_Renderer * r , Point texDim, std::vector<SDL_Rect> rects, std::vector<int> tileID){
-        SDL_Surface * destSurface = SDL_CreateRGBSurface(0, texDim.x, texDim.y, 32, 0, 0, 0, 0);
-        SDL_SetColorKey(destSurface,SDL_TRUE,SDL_MapRGB(destSurface->format,0x00,0x00,0x00));
-        for(int i=0;i<rects.size();i++)
-        {
-            Point srcTileIndex = getTileCoords(tileID[i]);
-            SDL_Rect src = {srcTileIndex.x, srcTileIndex.y, mTileDim.x, mTileDim.y};
-            SDL_BlitSurface(mTilemap, &src , destSurface, &rects[i]);
+    SDL_SetRenderTarget(renderer,NULL);
+    return new Texture(newTexture,gridSz.x, gridSz.y);
+}
+
+
+Tileset& Tilemapper::getTilesetByGlobalID(int GlID, std::vector<Tileset>& tilesets)
+{
+    GlID++;
+    for(Tileset& tileset : tilesets){
+        if(GlID >= tileset.firstGID && GlID <= tileset.lastGID)
+            return tileset;
+    }
+}
+
+std::vector<SDL_Rect> Tilemapper::getGrid(SDL_Point gridDim, SDL_Point colsDim)
+{
+    std::vector<SDL_Rect> rects;
+    for(int y=0; y<gridDim.y; y++)
+        for(int x=0; x<gridDim.x; x++) {
+            SDL_Rect r = {x*colsDim.x,y*colsDim.y,colsDim.x,colsDim.y};
+            rects.push_back(r);
         }
-            
-        SDL_Texture * newTexture = SDL_CreateTextureFromSurface(r,destSurface);
-		if(!newTexture){
-			SDL_Log("Unable to load texture: %s\n",SDL_GetError());
-			return NULL;
-		}
-		int width = destSurface->w;
-		int height = destSurface->h;
-		SDL_FreeSurface(destSurface);
-		return new Texture(newTexture, width, height);
-    }
-        
-    Texture * randomize(SDL_Renderer * r , Point texDim){
-        
-        SDL_Surface * destSurface = SDL_CreateRGBSurface(0, texDim.x, texDim.y, 32, 0, 0, 0, 0);
-        for(int y=0; y<texDim.y; y += mTileDim.y)
-            for(int x=0; x<texDim.x;x += mTileDim.x)
-            {
-                Point srcTileIndex = getTileCoords(Random::randInt(0,mTilesAmnt));
-                SDL_Rect src = {srcTileIndex.x, srcTileIndex.y, mTileDim.x, mTileDim.y};
-                SDL_Rect dest = {x,y, mTileDim.x, mTileDim.y};
-                SDL_BlitSurface(mTilemap, &src , destSurface, &dest);
-            }
-            
-        SDL_Texture * newTexture = SDL_CreateTextureFromSurface(r,destSurface);
-		if(!newTexture){
-			SDL_Log("Unable to load texture: %s\n",SDL_GetError());
-			return NULL;
-		}
-		int width = destSurface->w;
-		int height = destSurface->h;
-		SDL_FreeSurface(destSurface);
-		return new Texture(newTexture, width, height);
-    }
-    
-private:
-    SDL_Surface * mTilemap;
-    Point mTileDim;
-    int mTilesAmnt;
-};
+    return rects;
+}
+
