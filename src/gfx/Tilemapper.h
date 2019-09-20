@@ -1,26 +1,7 @@
-#include "includes.h"
+
 #ifndef TILEMAPPER_H
 #define TILEMAPPER_H
 
-
-struct Collider {
-    int ID;
-    int state;
-};
-// Structure representing a tileset
-struct Tileset {
-    int id=-1;
-    std::string filename;
-    std::string name;
-    int firstGID;
-    int lastGID;
-    int num;
-    int rows;
-    int cols;
-    SDL_Point dim;
-    std::vector<Collider> colliders;
-    SDL_Texture * tilemap;
-};
 
 class Tilemapper{
 

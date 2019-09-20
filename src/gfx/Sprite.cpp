@@ -1,4 +1,4 @@
-#include "includes.h"
+
 
 
 class Sprite : public Renderable
@@ -55,7 +55,7 @@ public:
     }
 
     // Adds new animation with given name and co-rdinates on tilesheet
-    bool addAnimation(Animation& ani) {
+    bool addAnimation(Animation* ani) {
         if(mAnimationIndex+1>=mAnimationMax) return false;
         mAnimationIndex++;
         // Add points given to new animation object

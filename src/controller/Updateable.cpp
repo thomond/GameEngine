@@ -1,5 +1,5 @@
 class Updateable{
 public:
-virtual void update(){}
+virtual void update()=0;
 
 };

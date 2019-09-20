@@ -6,21 +6,31 @@
 #include "SDL2/SDL_ttf.h"
 #include <vector>
 #include "Util.cpp"
-#include "Renderable.cpp"
-#include "Updateable.cpp"
-#include "EventHandler.cpp"
-#include "DisplayManager.cpp"
-#include "ResourceManager.cpp"
+#include "controller/Updateable.cpp"
+#include "display/Renderable.cpp"
+#include "controller/EventHandler.cpp"
+#include "gfx/Texture.cpp"
+#include "gfx/TextTexture.cpp"
+#include "gfx/Animated.cpp"
+#include "gfx/Sprite.cpp"
+#include "gfx/Structs.h"
+#include "gfx/Tilemapper.cpp"
+#include "model/ResourceManager.cpp"
+#include "model/tmxconfigmanager.cpp"
 
-#include "Entity.cpp"
-#include "Actor.cpp"
-#include "Player.cpp"
+#include "stage/Entity.cpp"
+#include "stage/Actor.cpp"
+#include "stage/Player.cpp"
+
+#include "display/DisplayManager.cpp"
 
 
-#include "AIActor.cpp"
-//#include "Stage.h"
 
-#include "UIManager.cpp"
+
+#include "stage/AIActor.cpp"
+#include "stage/Stage.cpp"
+
+#include "UI/UIManager.cpp"
 
 
 

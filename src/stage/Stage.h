@@ -1,36 +1,45 @@
-struct Collider {
-    int ID;
-    int state;
-};
-// Structure representing a tileset
-struct Tileset {
-    int id=-1;
-    std::string filename;
+#ifndef STAGE_H
+#define STAGE_H
+
+/**
+ * @todo
+ * @name Stage
+ * @brief Represent a level or stage comprising of a scrolling map of muktiple layers
+ */
+class Stage : public Renderable, public Updateable
+{
+public:
+
     std::string name;
-    int firstGID;
-    int lastGID;
-    int num;
-    int rows;
-    int cols;
-    SDL_Point dim;
-    std::vector<Collider> colliders;
-    SDL_Texture * tilemap;
+    ResourceManager * resources;
+    SDL_Rect mViewport = {0};
+    Point    stageDim = Point(1000,1000);
+
+    Stage(std::string stagename, ResourceManager * res);
+
+    /**
+     * Destructor
+     */
+    ~Stage();
+    void       addActor(Actor * actor);
+    void       renderLayer(int layerID, SDL_Renderer *r);
+    void       setLayer(int layerID, Texture* tex);
+    int        addLayer(int priority, Layer& layer);
+    SDL_Rect * getViewPort();
+    void       scrollViewport(int x, int y);
+    void       render(SDL_Renderer *r);
+    void       update();
+    void       handleEvents(SDL_Event e) ;
+private:
+    Actor * mActorList[8] = {NULL};
+    int mActorAmnt = 0;
+    Texture * mBgTexture;
+    std::vector<Texture*> mFgTexture;
+    int mCollisionRectAmnt;
+    int mCollisionRectMax = 20;
 };
 
+#endif // STAGE_H
 
 
-/*
-    * Represents a tiled layer composited from a tileset
-    * Also contains collison detection information
-    */
-struct Layer {
-    int id=-1;
-    std::vector<std::vector<int>> IDs;
-    Texture * texture;
-    std::string name;
-    SDL_Point dim;
-    std::vector<SDL_Rect> colliders;
-    int actionState =  Entity::State::Undefined;
-    void (*actionFunc)() = NULL;
-    std::string tilesetName;
-};
+

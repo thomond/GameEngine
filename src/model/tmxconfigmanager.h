@@ -1,4 +1,4 @@
-#include "includes.h"
+
 #ifndef TMXCONFIGMANAGER_H
 #define TMXCONFIGMANAGER_H
 #include <tmxlite/Map.hpp>
@@ -10,7 +10,7 @@ class TMXConfigManager
 {
 public:
 
-    bool load(char * filename);
+    bool load(std::string filename);
 
     std::vector<Layer>* getTileLayers();
     std::vector<Tileset>*  getTilesets();

@@ -3,10 +3,10 @@
 
 
 
-void ResourceManager::init(SDL_Renderer * renderer, char* filename)
+void ResourceManager::init(SDL_Renderer * renderer, std::string filename)
 {
     if(!mTMXConfig.load(filename))
-        SDL_LogError("%s couldn' be loaded. ",filename);
+        SDL_LogError("%s couldn' be loaded. ",filename.c_str());
     loadTileLayers();
     loadTilesets();
     for(auto& tileset : mTilesets){

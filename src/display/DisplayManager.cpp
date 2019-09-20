@@ -1,39 +1,11 @@
-#include "includes.h"
-#include "Texture.cpp"
 
-/*
-    * Represents a tiled layer composited from a tileset
-    * Also contains collison detection information
-    */
-struct Layer {
-    int id = -1;
-    std::vector<std::vector<int>> IDs;
-    Texture * texture;
-    std::string name;
-    SDL_Point dim;
-    std::vector<SDL_Rect> colliders;
-    int actionState = -1;
-    void (*actionFunc)() = NULL;
-    std::string tilesetName;
-};
-
-#include "TextTexture.cpp"
-#include "Animated.cpp"
-#include "Sprite.cpp"
-#include "Tilemapper.cpp"
-#include "tmxconfigmanager.cpp"
 
 class DisplayManager : Renderable
 {
 
     SDL_Window* mWindow = NULL;
     SDL_Renderer* mRenderer = NULL;
-
-    SDL_Rect mViewport = {0};
-    Point stageDim = Point(1000,1000);
-    Texture * mBgTexture = NULL;
-    std::vector<Texture *> mFgTexture;
-
+    std::vector<Renderable*> mRenderPipeline;
 
 
 
@@ -56,17 +28,6 @@ public:
 
     DisplayManager() {}
 
-    SDL_Rect * getViewPort() {
-        if (mViewport.w == 0 && mViewport.h == 0) return NULL;
-        return &mViewport;
-
-    }
-
-    void scrollViewport(int x, int y) {
-        // TODO: check bounds of camera
-        mViewport.x += x;
-        mViewport.y += y;
-    }
 
     bool init(char* title, int scr_w, int scr_h) {
         // create main mWindow and renderer
@@ -94,12 +55,28 @@ public:
         // Renderer BG color
         SDL_SetRenderDrawColor(mRenderer, 0x00,0x00,0x00,0x00);
         // Set mViewport to start pos of stage
-        mViewport = { 0, 0, scr_w, scr_h};
+        //mViewport = { 0, 0, scr_w, scr_h};
     }
 
     bool clear()
     {
         SDL_RenderClear(mRenderer);
+    }
+
+    // add renderable obj to render pipeline
+    void addToRenderPipeline(Renderable * ren){
+        if(ren==NULL){
+            SDL_LogError(SDL_LOG_PRIORITY_WARN, "Renderable is NULL!...");
+            return;
+        }
+        mRenderPipeline.push_back(ren);
+    }
+
+    // Process all Renderables
+    void renderAll(){
+        for(auto renderable : mRenderPipeline){
+            renderable->render(mRenderer);
+        }
     }
 
     bool setRenderScale(float scale) {
@@ -114,45 +91,9 @@ public:
         mRenderer = r;
     }
 
-    /* Render a src texture to a destination texture, e.g. layer. Texture nust have the right flags
-    bool renderTo(SDL_Texture *texSrc, SDL_Texture *texDest){
-        SDL_SetRenderTarget(mRenderer, texDest);
-
-        //SDL_SetRenderTarget(mRenderer, texDest);
-    }*/
-
-
-    // Directly Render layer by index
-    void renderLayer(int layerID) {
-        if (layerID == 0 && mBgTexture != NULL)
-            // render relative to viewport
-            mBgTexture->render(mRenderer,-mViewport.x, -mViewport.y);
-        else if (layerID > 0 && !mFgTexture.empty())
-            for(auto tex : mFgTexture)
-                // render relative to viewport
-                tex->render(mRenderer,-mViewport.x, -mViewport.y);
-        //else SDL_Log("Layer not defined: %d",layerID);
-    }
-
-    // Set layer texture
-    void setLayer(int layerID, Texture* tex) {
-        if (layerID == 0) {
-            mBgTexture = tex;
-        }
-        else if (layerID > 0) {
-            mFgTexture.push_back(tex);
-        } else SDL_Log("Layer not defined: %d",layerID);
-    }
-
-
     void render() {
         SDL_RenderPresent(mRenderer);
     }
-
-//     bool render(Renderable r) {
-//         r.render();
-//         SDL_RenderPresent();
-//     }
 
     Texture * loadTexture(char * filename) {
         return Texture::loadFromFile(mRenderer,filename);

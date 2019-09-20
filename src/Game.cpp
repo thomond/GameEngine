@@ -12,7 +12,7 @@ public:
 
     Game();
 
-    bool init();
+    bool init(std::string TMXFilename);
 
     // game looper
     void doLoop();
@@ -21,10 +21,12 @@ public:
     void updateAll();
     // Main Game rnderer function
     void renderAll();
-    void addActor(Actor * actor);
-    int addLayer(int priority, Layer& layer);
-    int addBGLayer(Texture * tex);
-    int addFGLayer(Texture * tex, std::vector<SDL_Rect> rect, const char * name, Entity::State actionState);
+
+    // Set stage by first entry in list or id
+    int  setStage();
+    int  setStage(std::string stage_name);
+    int addStage(std::string stage_name);
+    Stage * getStage(); // Returns current stage
     void loadFromTMX(char * TMXFilename);
 
 protected:
@@ -32,14 +34,9 @@ protected:
     DisplayManager * display;
     UIManager * ui;
     //SoundManager * sound;
-    ResourceManager resources;
-    Tilemapper * mTileMapper;
-    // TODO: use List or Queue
-    Actor * mActorList[8] = {NULL};
-    int mActorAmnt = 0;
-
-    int mCollisionRectAmnt;
-    int mCollisionRectMax = 20;
+    ResourceManager * resources;
+    std::vector<Stage*> stages;
+    Stage * mCurrStage;
 
     bool inLoop = true;
     bool DEBUG = true;
@@ -47,7 +44,7 @@ protected:
 
 Game::Game() {}
 
-bool Game::init()
+bool Game::init(std::string TMXFilename)
 {
 
 
@@ -63,22 +60,18 @@ bool Game::init()
     display = new DisplayManager();
     ui = new UIManager();
     //sound = SoundManager::getInstance();
-
+    resources = new ResourceManager();
 
     display->init("Test",1300,1000);
     ui->init("RobotoSlab-Regular.ttf",24);
     //sound->init();
+    resources->init(display->getRenderer(), TMXFilename);
+    stages = std::vector<Stage *>();
+
     return true;
 }
 
-void Game::loadFromTMX(char * TMXFilename) {
-    resources.init(display->getRenderer(), TMXFilename);
-    int pri=0;
-    for(auto& layer : resources.getLayers()) {
 
-        addLayer(pri++,layer);
-    }
-}
 
 // game looper
 void Game::doLoop()
@@ -108,16 +101,9 @@ void Game::handleEvents() {
                 break;
             }
         }
-        int i;
-        while(i!=mActorAmnt)
-        {
-            mActorList[i]->handleEvent(e);
-            i++;
-        }
         handleEvent(e);
     }
 }
-
 
 void Game::clear() {
     display->clear();
@@ -126,51 +112,15 @@ void Game::clear() {
 
 
 void Game::updateAll() {
-    int i=0;
-    while(i!=mActorAmnt)
-    {
-
-        // For each collision grid check if there's a collison and either set the actor's state or call a callback func
-        for(auto& layer : resources.getLayers())
-        {
-            if(layer.colliders.empty()) continue;// No Colliders in layer
-            for(SDL_Rect rect :  layer.colliders )
-            {
-                if(layer.actionFunc != NULL) {
-                    if(mActorList[i]->collidesWith(&rect))
-                        layer.actionFunc();
-                }
-                if(layer.actionState!=NULL) {
-                    if(mActorList[i]->collidesWith(&rect))
-                        mActorList[i]->setState(layer.actionState);
-                }
-
-            }
-
-        }
-        // Call Actor update function after sttaes hav been set by game
-        mActorList[i]->update();
-        i++;
-    }
+    
     // Call game update virtual func
     update();
 }
 
 // Main Game rnderer function
 void Game::renderAll() {
-    // Render BG texture if any
-    display->renderLayer(0);
-    display->renderLayer(1);
-
-    // Render any actor stored
-    int i=0;
-    while(i!=mActorAmnt)
-    {
-        if(display->getViewPort()!=NULL)
-            mActorList[i]->render(display->getRenderer(), mActorList[i]->getPosx(), mActorList[i]->getPosy(), Point(display->getViewPort()->x,display->getViewPort()->y));
-        i++;
-    }
-    for(auto& layer : resources.getLayers()) {
+    mCurrStage->render(display->getRenderer());
+    for(auto& layer : resources->getLayers()) {
         for(SDL_Rect rect :  layer.colliders )
         {
             //if(DEBUG && mCollisionRectAmnt>0)
@@ -181,32 +131,25 @@ void Game::renderAll() {
     display->render();
 }
 
-
-void Game::addActor(Actor * actor) {
-    if(mActorAmnt==8) {
-        SDL_LogError("Too many actors",NULL);
-        return;
+int  Game::setStage(std::string stage_name) {
+    for(Stage* stage : stages) {
+        if(stage->name==stage_name)
+            mCurrStage = stage;
     }
-    mActorList[mActorAmnt] = actor;
-    mActorAmnt++;
 }
 
-int Game::addLayer(int priority, Layer& layer)
-{
-    //resources.getLayers().push_back(layer);
-    display->setLayer(priority, layer.texture);
-
+// @brief Add new stage to game called @stage_name
+int Game::addStage(std::string stage_name){
+    Stage * stage = new Stage(stage_name,resources);
+    stages.push_back(stage); 
 }
 
-int Game::addBGLayer(Texture * tex) {
-    display->setLayer(0,tex);
+int  Game::setStage() {
+    if(stages.empty()) return -1;
+    mCurrStage = stages[0];
     return 0;
 }
 
-
-int Game::addFGLayer(Texture * tex, std::vector<SDL_Rect> rect, const char * name, Entity::State actionState)
-{
-    display->setLayer(1,tex);
-    //addCollisionRects(rect,name,actionState);
-    return 0;
+Stage * Game::getStage() {
+    return mCurrStage;
 }

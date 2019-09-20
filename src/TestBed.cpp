@@ -10,12 +10,12 @@ private:
     AIActor * aiactor;
     Tilemapper * tilemapper;
 public:
-    TestBed(){
-        Game();
+    TestBed() : Game(){
+        //Game();
     }
     
     void init(){
-        Game::init();
+        Game::init("tilemap.tmx");
         Texture * tex = display->loadTexture( "tilesheet.png");
         Texture * tex2 = display->loadTexture("soldier_blk.png");
         // Set player colision rect, tilemap tex,  and dimensions
@@ -26,10 +26,10 @@ public:
         aiactor->init(tex2,Point(256,256), Point(32,32), rect );
         
         // Add actor to game Actor queue
-        addActor(player);
-        addActor(aiactor);
+        getStage()->addActor(player);
+        getStage()->addActor(aiactor);
         
-        loadFromTMX("tilemap.tmx");
+        //loadFromTMX();
         
         // Add a toolbar
         //ui->addToolbar({0,0,display->getViewPort()->w,50},"test");
@@ -64,10 +64,10 @@ public:
         if (e.type == SDL_KEYDOWN)
         {
             switch(e.key.keysym.sym){
-                case SDLK_l: display->scrollViewport( 5, 0); break;
-                case SDLK_j: display->scrollViewport(-5, 0); break;
-                case SDLK_i: display->scrollViewport( 0,-5); break;
-                case SDLK_k: display->scrollViewport( 0,+5); break;
+                case SDLK_l: mCurrStage->scrollViewport( 5, 0); break;
+                case SDLK_j: mCurrStage->scrollViewport(-5, 0); break;
+                case SDLK_i: mCurrStage->scrollViewport( 0,-5); break;
+                case SDLK_k: mCurrStage->scrollViewport( 0,+5); break;
             }
         }
     }

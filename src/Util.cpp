@@ -7,6 +7,9 @@
 
 
 
+
+
+
 class Point{
 public:
     int x;
@@ -199,6 +202,7 @@ public:
     
     
 };
+
 
 
 

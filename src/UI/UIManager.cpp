@@ -66,7 +66,7 @@ public:
     
     UIManager() {}
     
-    bool init(char* fontNm,char* fontSz){
+    bool init(char* fontNm,int fontSz){
         
 		// Init TTF_lib
 		if(TTF_Init()==-1){

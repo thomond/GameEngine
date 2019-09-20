@@ -1,4 +1,4 @@
-#include "includes.h"
+
 
 class Actor : public Entity,public Sprite, public Updateable, public EventHandler
 {
