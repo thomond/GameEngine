@@ -1,10 +1,10 @@
-= SDL based 2d Game Engine  
+SDL based 2d Game Engine  
 * Basic UI Manager
 * Basic Sound Manager
 * Display Manager
- * 
+   * 
 * Resource Manager
- * TMX file support
+   * TMX file support
 
 SDL control types
 * Renderable - Abstract type that is be rendered on screen with SDL_Renderer
@@ -20,12 +20,12 @@ Display types
 
 Higher Level Types
 * Stage
- * Multiple Layers
-  * Viewport for scrolling
-  * Tilemapper
-  * Colour Primitive
-  * Collision layers
+  * Multiple Layers
+    * Viewport for scrolling
+    * Tilemapper
+    * Colour Primitive
+    * Collision layers
 * Actor 
- * Player
- * AIActor
+  * Player
+  * AIActor
  
