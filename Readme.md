@@ -1,4 +1,4 @@
-=== SDL based 2d Game Engine  ===
+=== SDL based 2d Game Engine  
 * Basic UI Manager
 * Basic Sound Manager
 * Display Manager
