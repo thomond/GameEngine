@@ -1,6 +1,6 @@
 class EventHandler{
     public:
     // Event Handler to be overridden 
-    virtual void handleEvent(SDL_Event& e){}
+    virtual void handleEvent(SDL_Event& e)=0;
 
 };

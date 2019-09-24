@@ -106,7 +106,7 @@
   </tile>
  </tileset>
  <tileset firstgid="57" name="tilesheet" tilewidth="32" tileheight="32" tilecount="16" columns="4">
-  <image source="../../../../../../mnt/lacie/src/sdl/GameEngine/bin/tilesheet.png" trans="ff00ff" width="128" height="128"/>
+  <image source="tilesheet.png" trans="ff00ff" width="128" height="128"/>
   <tile id="0">
    <objectgroup draworder="index">
     <object id="1" x="7.66667" y="3.66667" width="16.3333" height="24"/>
@@ -144,7 +144,7 @@
   </tile>
  </tileset>
  <tileset firstgid="73" name="soldier_blk" tilewidth="32" tileheight="32" tilecount="16" columns="4">
-  <image source="../../../../../../mnt/lacie/src/sdl/GameEngine/bin/soldier_blk.png" trans="ff00ff" width="128" height="128"/>
+  <image source="soldier_blk.png" trans="ff00ff" width="128" height="128"/>
   <tile id="0">
    <animation>
     <frame tileid="0" duration="350"/>

@@ -18,17 +18,21 @@ public:
         Game::init("tilemap.tmx");
         Texture * tex = display->loadTexture( "tilesheet.png");
         Texture * tex2 = display->loadTexture("soldier_blk.png");
-        // Set player colision rect, tilemap tex,  and dimensions
+        // Set player colision rect, tdilemap tex,  and dimensions
         player = new Player();
         aiactor = new AIActor();
         SDL_Rect rect = {6,16,26,6};
         player->init(tex, Point(32,300), Point(32,32), rect);
         aiactor->init(tex2,Point(256,256), Point(32,32), rect );
         
+
+
+        addStage("test_stage");
         // Add actor to game Actor queue
         getStage()->addActor(player);
         getStage()->addActor(aiactor);
-        
+        //getStage()->addLayer(0,tilemapper->getLayer("BGLayer"));
+        //getStage()->addLayer(1,tilemapper->getLayer("FGLayer"));
         //loadFromTMX();
         
         // Add a toolbar
@@ -40,8 +44,7 @@ public:
         
     
             
-        //addLayer(0,tilemapper->getLayer("BGLayer"));
-       // addLayer(1,tilemapper->getLayer("FGLayer"));
+        
     
 
 

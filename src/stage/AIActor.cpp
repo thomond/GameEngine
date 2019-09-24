@@ -27,5 +27,6 @@ public:
 
     }
 
+    void handleEvent(SDL_Event& e){}
 
 };
